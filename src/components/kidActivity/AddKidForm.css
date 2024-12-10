@@ -1,0 +1,108 @@
+/* .add-kid-form {
+  width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-kid-form h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: seagreen;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #3e8e41;
+}
+
+.avatar-preview {
+  text-align: center;
+  margin: 15px 0;
+}
+
+/* .avatar-preview img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+} */
+
+/* .avatar-preview img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 50%; This makes the image circular */
+/* border: 2px solid #ccc; 
+}
+*/
+
+.add-kid-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.add-kid-form input {
+  padding: 10px;
+  margin: 10px 0;
+  width: 250px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-kid-form button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-kid-form button:hover {
+  background-color: #45a049;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-top: 10px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}

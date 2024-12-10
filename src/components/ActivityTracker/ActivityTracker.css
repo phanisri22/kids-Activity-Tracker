@@ -1,0 +1,39 @@
+.activity-tracker {
+  text-align: center;
+}
+
+.activity-list {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.activity-cell {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.activity-cell.done {
+  background-color: green;
+  color: white;
+}
+
+.activity-cell.notDone {
+  background-color: red;
+  color: white;
+}
+
+.miscellaneous {
+  margin-top: 20px;
+}
+
+.miscellaneous-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px auto;
+  width: 300px;
+}

@@ -1,0 +1,94 @@
+/* Add this CSS to App.css */
+
+.activity-scheduler {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.kids,
+.activities,
+.schedule,
+.dashboard {
+  margin-bottom: 20px;
+}
+
+.kid-button {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.kid-button:hover {
+  background-color: #0056b3;
+}
+
+.input-box {
+  padding: 8px;
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.activity-item {
+  background-color: #f1f1f1;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 5px 0;
+}
+
+.day {
+  margin-bottom: 15px;
+}
+
+.day-title {
+  font-weight: bold;
+  color: #333;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.time-label {
+  margin-right: 10px;
+  color: #555;
+}
+
+.dropdown {
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.freeze-button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.freeze-button:hover {
+  background-color: #218838;
+}
+
+.kid-summary {
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin: 5px 0;
+}
