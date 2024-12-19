@@ -1,5 +1,3 @@
-/* Add this CSS to App.css */
-
 .activity-scheduler {
   font-family: Arial, sans-serif;
   padding: 20px;
@@ -91,4 +89,31 @@
   background-color: #e9ecef;
   border-radius: 4px;
   margin: 5px 0;
+}
+
+.avatar-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  margin-right: 10px;
+}
+
+.dashboard {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.weekly-dashboard h2,
+.monthly-dashboard h2 {
+  color: #007bff;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
