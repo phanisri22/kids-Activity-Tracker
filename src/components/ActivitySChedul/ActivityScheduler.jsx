@@ -1,46 +1,39 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import "./App.css";
 
 const ActivityScheduler = () => {
-  const [kids, setKids] = useState([]);
-  const [selectedKid, setSelectedKid] = useState(null);
+  const location = useLocation();
+  const selectedKid = location.state?.kid;
+
   const [activities, setActivities] = useState([]);
   const [schedule, setSchedule] = useState({});
-  const [points, setPoints] = useState({});
-  const [dailyPoints, setDailyPoints] = useState({});
+  const [points, setPoints] = useState(0);
+  const [dailyPoints, setDailyPoints] = useState(0);
+  const [weeklyPoints, setWeeklyPoints] = useState({});
   const [monthlyPoints, setMonthlyPoints] = useState([]);
+  const [lastEndedDay, setLastEndedDay] = useState(null); // Track the last day ended
 
-  // Current date
   const currentDate = new Date();
+  const today = currentDate.toDateString();
 
-  // UseEffect to handle end-of-month calculation
+  // Prevent multiple end day actions for the same day
+  const isTodayEnded = lastEndedDay === today;
+
   useEffect(() => {
-    const daysInMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
+    const totalMonthlyPoints = monthlyPoints.reduce(
+      (sum, mp) => sum + mp.points,
       0
-    ).getDate();
+    );
+    console.log(`Monthly total: ${totalMonthlyPoints} points`);
+  }, [monthlyPoints]);
 
-    if (monthlyPoints.length >= daysInMonth) {
-      alert(
-        `Total points for ${currentDate.toLocaleString("default", {
-          month: "long",
-        })}: ${monthlyPoints.reduce((sum, mp) => sum + mp.points, 0)} points`
-      );
-      setMonthlyPoints([]); // Reset for the next month
-    }
-  }, [monthlyPoints, currentDate]);
-
-  // Add a new kid
-  const addKid = (name) => {
-    const newKid = { id: Date.now(), name };
-    setKids([...kids, newKid]);
-    setPoints((prev) => ({ ...prev, [newKid.id]: 0 }));
-  };
+  if (!selectedKid) {
+    return <p>No kid selected. Please return to the Add Kid form.</p>;
+  }
 
   // Add a new activity
   const addActivity = (activity) => {
-    if (!selectedKid) return;
     setActivities((prev) => [...prev, { id: Date.now(), name: activity }]);
   };
 
@@ -48,22 +41,17 @@ const ActivityScheduler = () => {
   const updateSchedule = (day, time, activityId) => {
     setSchedule((prev) => ({
       ...prev,
-      [selectedKid.id]: {
-        ...(prev[selectedKid.id] || {}),
-        [day]: {
-          ...(prev[selectedKid.id]?.[day] || {}),
-          [time]: { activityId, isDone: false, points: 0 },
-        },
+      [day]: {
+        ...(prev[day] || {}),
+        [time]: { activityId, isDone: false, points: 0 },
       },
     }));
   };
 
   // Freeze activity and assign points
   const freezeActivity = (day, time, isDone, pointsToAdd) => {
-    if (!selectedKid) return;
-
     setSchedule((prev) => {
-      const updatedDay = prev[selectedKid.id]?.[day] || {};
+      const updatedDay = prev[day] || {};
       updatedDay[time] = {
         ...updatedDay[time],
         isDone,
@@ -72,159 +60,124 @@ const ActivityScheduler = () => {
 
       return {
         ...prev,
-        [selectedKid.id]: {
-          ...(prev[selectedKid.id] || {}),
-          [day]: updatedDay,
-        },
+        [day]: updatedDay,
       };
     });
 
-    // Update daily points
-    const newPoints = points[selectedKid.id] + (isDone ? pointsToAdd : 0);
-    setPoints((prev) => ({ ...prev, [selectedKid.id]: newPoints }));
+    setPoints((prev) => prev + (isDone ? pointsToAdd : 0));
+    setDailyPoints((prev) => prev + (isDone ? pointsToAdd : 0));
 
-    setDailyPoints((prev) => ({
+    setWeeklyPoints((prev) => ({
       ...prev,
-      [selectedKid.id]: newPoints,
+      [day]: (prev[day] || 0) + (isDone ? pointsToAdd : 0),
     }));
   };
 
-  // End the day
+  // End the day with confirmation
   const endDay = () => {
-    if (!selectedKid) return;
+    if (isTodayEnded) {
+      alert("You have already ended the day!");
+      return;
+    }
 
-    const dailyTotal = dailyPoints[selectedKid.id] || 0;
-    setMonthlyPoints((prev) => [
-      ...prev,
-      { kidId: selectedKid.id, points: dailyTotal },
-    ]);
+    const confirmEnd = window.confirm("Are you sure you want to end the day?");
+    if (confirmEnd) {
+      setMonthlyPoints((prev) => [
+        ...prev,
+        { kidId: selectedKid.id, day: today, points: dailyPoints },
+      ]);
 
-    // Reset daily activities
-    setSchedule((prev) => {
-      const updatedSchedule = { ...prev[selectedKid.id] };
-
-      Object.keys(updatedSchedule).forEach((day) => {
-        Object.keys(updatedSchedule[day]).forEach((time) => {
-          updatedSchedule[day][time] = {
-            ...updatedSchedule[day][time],
-            isDone: false,
-            points: 0,
-          };
-        });
-      });
-
-      return { ...prev, [selectedKid.id]: updatedSchedule };
-    });
-
-    // Reset daily points
-    setDailyPoints((prev) => ({ ...prev, [selectedKid.id]: 0 }));
+      setLastEndedDay(today); // Record the day as ended
+      setDailyPoints(0); // Reset daily points
+    }
   };
 
   return (
     <div className="activity-scheduler">
-      <h1>Kid Activity Scheduler</h1>
+      <h1>Activity Scheduler for {selectedKid.name}</h1>
+      <img
+        src={selectedKid.avatar}
+        alt={`${selectedKid.name}'s Avatar`}
+        className="kid-avatar-large"
+      />
 
-      {/* Kids Section */}
-      <div className="kids">
-        <h2>Kids</h2>
-        {kids.map((kid) => (
-          <button
-            key={kid.id}
-            className="kid-button"
-            onClick={() => {
-              setSelectedKid(kid);
-              setActivities([]); // Reset activities
-            }}
-          >
-            {kid.name}
-          </button>
+      {/* Activities Section */}
+      <div className="activities">
+        <h2>Activities</h2>
+        {activities.map((activity) => (
+          <div key={activity.id} className="activity-item">
+            {activity.name}
+          </div>
         ))}
         <input
           type="text"
           className="input-box"
-          placeholder="Add kid"
+          placeholder="Add activity"
           onKeyDown={(e) => {
-            if (e.key === "Enter") addKid(e.target.value);
+            if (e.key === "Enter") addActivity(e.target.value);
           }}
         />
       </div>
 
-      {/* Activities Section */}
-      {selectedKid && (
-        <div className="activities">
-          <h2>Activities for {selectedKid.name}</h2>
-          {activities.map((activity) => (
-            <div key={activity.id} className="activity-item">
-              {activity.name}
-            </div>
-          ))}
-          <input
-            type="text"
-            className="input-box"
-            placeholder="Add activity"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") addActivity(e.target.value);
-            }}
-          />
-        </div>
-      )}
-
       {/* Weekly Schedule */}
-      {selectedKid && (
-        <div className="schedule">
-          <h2>Weekly Schedule</h2>
-          {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
-            (day) => (
-              <div key={day} className="day">
-                <h3 className="day-title">{day}</h3>
-                {["Morning", "Afternoon", "Evening"].map((time) => (
-                  <div key={time} className="time-slot">
-                    <span className="time-label">{time}:</span>
-                    <select
-                      className="dropdown"
-                      onChange={(e) =>
-                        updateSchedule(day, time, e.target.value)
-                      }
-                    >
-                      <option value="">Select Activity</option>
-                      {activities.map((activity) => (
-                        <option key={activity.id} value={activity.id}>
-                          {activity.name}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      className="freeze-button"
-                      onClick={() => freezeActivity(day, time, true, 10)}
-                    >
-                      Done +10
-                    </button>
-                  </div>
-                ))}
+      <div className="schedule">
+        <h2>Weekly Schedule</h2>
+        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => (
+          <div key={day} className="day">
+            <h3>{day}</h3>
+            {["Morning", "Afternoon", "Evening"].map((time) => (
+              <div key={time} className="time-slot">
+                <span>{time}:</span>
+                <select
+                  onChange={(e) => updateSchedule(day, time, e.target.value)}
+                >
+                  <option value="">Select Activity</option>
+                  {activities.map((activity) => (
+                    <option key={activity.id} value={activity.id}>
+                      {activity.name}
+                    </option>
+                  ))}
+                </select>
+                <button onClick={() => freezeActivity(day, time, true, 10)}>
+                  Done +10
+                </button>
               </div>
-            )
-          )}
-        </div>
-      )}
-
-      {/* Dashboard Section */}
-      <div className="dashboard">
-        <h2>Summary Dashboard</h2>
-        {kids.map((kid) => (
-          <div key={kid.id} className="kid-summary">
-            {kid.name}: {points[kid.id]} points
+            ))}
           </div>
         ))}
-        <button onClick={endDay}>End Day</button>
+      </div>
+
+      {/* Points Summary */}
+      <div className="points-summary">
+        <h2>Points</h2>
+        <p>Total Points: {points}</p>
+        <button
+          onClick={endDay}
+          disabled={isTodayEnded} // Disable the button if today's end day is already recorded
+        >
+          End Day
+        </button>
+      </div>
+
+      {/* Weekly Dashboard */}
+      <div className="dashboard weekly-dashboard">
+        <h2>Weekly Dashboard</h2>
+        {Object.entries(weeklyPoints).map(([day, points]) => (
+          <p key={day}>
+            {day}: {points} points
+          </p>
+        ))}
+      </div>
+
+      {/* Monthly Dashboard */}
+      <div className="dashboard monthly-dashboard">
         <h2>Monthly Dashboard</h2>
         <ul>
-          {monthlyPoints
-            .filter((mp) => mp.kidId === selectedKid?.id)
-            .map((mp, index) => (
-              <li key={index}>
-                Day {index + 1}: {mp.points} points
-              </li>
-            ))}
+          {monthlyPoints.map((mp, index) => (
+            <li key={index}>
+              Day {mp.day}: {mp.points} points
+            </li>
+          ))}
         </ul>
       </div>
     </div>
